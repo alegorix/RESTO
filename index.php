@@ -5,7 +5,7 @@ session_start();
 // On inclut la connexion à la base
 require_once('connect.php');
 
-$sql = 'SELECT * FROM `tbl_menu`';
+$sql = 'SELECT * FROM `tbl_menu` JOIN `tbl_type_plat` ON tbl_menu.type_plat = tbl_type_plat.id_type_plat';
 
 // On prépare la requête
 $query = $db->prepare($sql);
@@ -66,7 +66,7 @@ require_once('close.php');
                         ?>
                             <tr>
                                 <td><?= $menu['id_plat'] ?></td>
-                                <td><?= $menu['type_plat'] ?></td>
+                                <td><?= $menu['nom_type_plat'] ?></td>
                                 <td><?= $menu['nom_plat'] ?></td>
                                 <td><?= $menu['desc_plat'] ?></td>
                                 <td><?= $menu['prix_plat'] ?> €</td>
