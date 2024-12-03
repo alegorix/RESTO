@@ -1,4 +1,3 @@
-
 <?php
 // On démarre une session
 session_start();
@@ -8,6 +7,26 @@ if($_POST){
     && isset($_POST['prix_plat']) && !empty($_POST['prix_plat'])
     && isset($_POST['type_plat']) && !empty($_POST['type_plat'])
     ){
+
+
+
+        $currentDirectory = getcwd();
+        $uploadDirectory = "/images/";
+    
+    
+        //$fileExtensionsAllowed = ['jpeg','jpg','png']; // These will be the only file extensions allowed 
+    
+        $fileName = $_FILES['image']['name'];
+        //$fileSize = $_FILES['image']['size'];
+        $fileTmpName  = $_FILES['image']['tmp_name'];
+        //$fileType = $_FILES['image']['type'];
+        //$fileExtension = strtolower(end(explode('.',$fileName)));
+    
+        $uploadPath = $currentDirectory . $uploadDirectory . basename($fileName); 
+    
+        $didUpload = move_uploaded_file($fileTmpName, $uploadPath);
+
+
         // On inclut la connexion à la base
         require_once('connect.php');
 
@@ -15,14 +34,17 @@ if($_POST){
         $nom_plat = strip_tags($_POST['nom_plat']);
         $prix_plat = strip_tags($_POST['prix_plat']);
         $type_plat = strip_tags($_POST['type_plat']);
+        $image_produit = strip_tags($_POST['image']);
+        $imageprod = $fileName;
 
-        $sql = 'INSERT INTO `tbl_menu` (`nom_plat`, `prix_plat`, `type_plat`) VALUES (:nom_plat, :prix_plat, :type_plat);';
+        $sql = 'INSERT INTO `tbl_menu` (`nom_plat`, `prix_plat`, `type_plat`, `photo_plat` ) VALUES (:nom_plat, :prix_plat, :type_plat, :imageprod);';
 
         $query = $db->prepare($sql);
 
         $query->bindValue(':nom_plat', $nom_plat, PDO::PARAM_STR);
         $query->bindValue(':prix_plat', $prix_plat, PDO::PARAM_STR);
         $query->bindValue(':type_plat', $type_plat, PDO::PARAM_STR);
+        $query->bindValue(':imageprod', $imageprod, PDO::PARAM_STR);
 
         $query->execute();
 
@@ -58,11 +80,12 @@ if($_POST){
                     }
                 ?>
                 <h1>Ajouter un plat</h1>
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="nom_plat">Nom du plat</label>
                         <input type="text" id="nom_plat" name="nom_plat" class="form-control">
                     </div>
+
                     <div class="form-group">
                         <label for="prix_plat">Prix du plat</label>
                         <input type="text" id="prix_plat" name="prix_plat" class="form-control">
@@ -92,7 +115,10 @@ if ($query->rowCount() > 0) { ?>
                     </select>
                     </div>
                     <?php } ?>
-
+                    <div class="form-group">
+                        <label for="image">Image du produit</label>
+                        <input type="file" id="image" name="image" class="form-control">
+                    </div>
 
                    
                     <button class="btn btn-primary">Envoyer</button>
